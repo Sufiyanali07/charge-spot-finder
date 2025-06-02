@@ -154,60 +154,90 @@ A full-stack application for managing EV charging stations with user authenticat
 4. Add environment variables from your `.env` file
 5. Deploy the site
 
-### Full-Stack Deployment (Vercel)
+### Full-Stack Deployment on Render (Recommended)
 
-1. Install Vercel CLI (optional for local testing):
-   ```
-   npm install -g vercel
-   ```
+Render.com is an excellent platform for deploying full-stack applications, handling both frontend and backend components seamlessly.
 
-2. Make sure you have the `vercel.json` configuration file in your project root with the following content:
-   ```json
-   {
-     "version": 2,
-     "builds": [
-       {
-         "src": "backend/src/server.js",
-         "use": "@vercel/node"
-       },
-       {
-         "src": "frontend/package.json",
-         "use": "@vercel/static-build",
-         "config": {
-           "distDir": "dist"
-         }
-       }
-     ],
-     "routes": [
-       {
-         "src": "/api/(.*)",
-         "dest": "backend/src/server.js"
-       },
-       {
-         "src": "/(.*)",
-         "dest": "frontend/dist/$1"
-       }
-     ]
-   }
-   ```
+1. Create a `render.yaml` file in your project root with the following content:
+   ```yaml
+   services:
+     # Backend API service
+     - type: web
+       name: charge-spot-finder-api
+       env: node
+       buildCommand: cd backend && npm install
+       startCommand: cd backend && npm start
+       envVars:
+         - key: PORT
+           value: 10000
+         - key: NODE_ENV
+           value: production
+         - key: MONGODB_URI
+           sync: false
+         - key: JWT_SECRET
+           sync: false
 
-3. Update your frontend's `.env` file to point to the Vercel deployment URL:
-   ```
-   VUE_APP_API_URL=https://your-vercel-app-name.vercel.app/api
+     # Frontend static site
+     - type: web
+       name: charge-spot-finder-frontend
+       env: static
+       buildCommand: cd frontend && npm install && npm run build
+       staticPublishPath: ./frontend/dist
+       routes:
+         - type: rewrite
+           source: /*
+           destination: /index.html
+       envVars:
+         - key: VUE_APP_API_URL
+           value: https://charge-spot-finder-api.onrender.com/api
+         - key: VUE_APP_MAPBOX_TOKEN
+           value: your_mapbox_token
    ```
 
-4. Deploy to Vercel:
+2. Update your frontend's `.env.production` file:
+   ```
+   VUE_APP_API_URL=https://charge-spot-finder-api.onrender.com/api
+   VUE_APP_MAPBOX_TOKEN=your_mapbox_token
+   ```
+
+3. Deploy to Render:
    - Push your code to GitHub
-   - Import your repository in the Vercel dashboard
-   - Configure environment variables (including MongoDB connection string and JWT secret)
-   - Deploy
+   - Sign up for Render.com and connect your GitHub account
+   - Click "New" and select "Blueprint"
+   - Select your repository
+   - Render will automatically detect the `render.yaml` file and set up both services
+   - Add your secret environment variables:
+     - `MONGODB_URI`: Your MongoDB connection string
+     - `JWT_SECRET`: Your JWT secret key
+   - Deploy both services
 
-5. Troubleshooting Vercel Deployment:
-   - Ensure your server.js is properly handling CORS for the Vercel domain
-   - Check that your API routes match the patterns defined in vercel.json
-   - Verify that all dependencies are correctly listed in package.json
-   - For function timeout errors, optimize your API response times or increase timeout limits
-   - For payload size errors, reduce the size of your request/response data
+4. Your application will be available at:
+   - Frontend: https://charge-spot-finder-frontend.onrender.com
+   - Backend API: https://charge-spot-finder-api.onrender.com
+
+### Alternative Deployment Options
+
+#### CORS Configuration
+
+Ensure your backend's CORS configuration allows requests from your Netlify frontend domain:
+
+```javascript
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-netlify-app.netlify.app', 'https://your-custom-domain.com'] 
+    : ['http://localhost:8080'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
+```
+
+#### Troubleshooting Deployment
+
+- **CORS Issues**: If you see CORS errors in the browser console, update your backend CORS configuration to include your frontend domain
+- **API Connection Issues**: Verify that your frontend's `.env.production` file has the correct API URL
+- **Build Errors**: Check the build logs in Netlify or Vercel for specific error messages
+- **Function Timeouts**: For long-running operations, optimize your API or increase timeout limits in Vercel
+- **Database Connection**: Ensure your MongoDB connection string is correct and the IP is whitelisted
 
 ### MongoDB Deployment
 
