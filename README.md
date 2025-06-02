@@ -126,6 +126,11 @@ A full-stack application for managing EV charging stations with user authenticat
 - `PUT /api/stations/:id` - Update a charging station (protected)
 - `DELETE /api/stations/:id` - Delete a charging station (protected)
 
+### Testing
+- `GET /api/test` - Get API status and system information
+- `GET /api/test/ping` - Simple ping-pong response for connectivity testing
+- `GET /` - Welcome message (root endpoint)
+
 ## Deployment
 
 ### Backend Deployment (Render)
@@ -164,6 +169,12 @@ A full-stack application for managing EV charging stations with user authenticat
 You can test the API endpoints using tools like Postman or curl:
 
 ```bash
+# Test API connectivity
+curl http://localhost:5000/api/test/ping
+
+# Get API status and information
+curl http://localhost:5000/api/test
+
 # Register a new user
 curl -X POST http://localhost:5000/api/auth/register \
   -H "Content-Type: application/json" \
