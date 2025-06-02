@@ -154,6 +154,61 @@ A full-stack application for managing EV charging stations with user authenticat
 4. Add environment variables from your `.env` file
 5. Deploy the site
 
+### Full-Stack Deployment (Vercel)
+
+1. Install Vercel CLI (optional for local testing):
+   ```
+   npm install -g vercel
+   ```
+
+2. Make sure you have the `vercel.json` configuration file in your project root with the following content:
+   ```json
+   {
+     "version": 2,
+     "builds": [
+       {
+         "src": "backend/src/server.js",
+         "use": "@vercel/node"
+       },
+       {
+         "src": "frontend/package.json",
+         "use": "@vercel/static-build",
+         "config": {
+           "distDir": "dist"
+         }
+       }
+     ],
+     "routes": [
+       {
+         "src": "/api/(.*)",
+         "dest": "backend/src/server.js"
+       },
+       {
+         "src": "/(.*)",
+         "dest": "frontend/dist/$1"
+       }
+     ]
+   }
+   ```
+
+3. Update your frontend's `.env` file to point to the Vercel deployment URL:
+   ```
+   VUE_APP_API_URL=https://your-vercel-app-name.vercel.app/api
+   ```
+
+4. Deploy to Vercel:
+   - Push your code to GitHub
+   - Import your repository in the Vercel dashboard
+   - Configure environment variables (including MongoDB connection string and JWT secret)
+   - Deploy
+
+5. Troubleshooting Vercel Deployment:
+   - Ensure your server.js is properly handling CORS for the Vercel domain
+   - Check that your API routes match the patterns defined in vercel.json
+   - Verify that all dependencies are correctly listed in package.json
+   - For function timeout errors, optimize your API response times or increase timeout limits
+   - For payload size errors, reduce the size of your request/response data
+
 ### MongoDB Deployment
 
 1. Create a MongoDB Atlas account
