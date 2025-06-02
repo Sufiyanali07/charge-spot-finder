@@ -10,6 +10,7 @@ dotenv.config();
 // Import routes
 const authRoutes = require('./routes/auth.routes');
 const stationRoutes = require('./routes/station.routes');
+const testRoutes = require('./routes/test.routes');
 
 // Initialize Express app
 const app = express();
@@ -26,6 +27,7 @@ connectDB();
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/stations', stationRoutes);
+app.use('/api/test', testRoutes);
 
 // Root route
 app.get('/', (req, res) => {
