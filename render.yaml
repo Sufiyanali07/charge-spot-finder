@@ -22,7 +22,7 @@ services:
     name: charge-spot-finder-frontend
     env: static
     nodeVersion: 16
-    buildCommand: cd frontend && npm install && npm run build:render
+    buildCommand: cd frontend && npm install && NODE_ENV=production npx --no-install vue-cli-service build
     staticPublishPath: ./frontend/dist
     routes:
       - type: rewrite
