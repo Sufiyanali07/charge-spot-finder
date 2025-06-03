@@ -4,7 +4,7 @@ services:
     name: charge-spot-finder-api
     env: node
     runtime: node
-    nodeVersion: 16
+    nodeVersion: 18
     buildCommand: cd backend && npm install
     startCommand: cd backend && npm start
     envVars:
@@ -21,10 +21,7 @@ services:
   - type: web
     name: charge-spot-finder-frontend
     env: static
-    buildEnv:
-      - name: NODE_VERSION
-        value: 16
-    buildCommand: cd frontend && npm install && NODE_ENV=production npx --no-install vue-cli-service build
+    buildCommand: cd frontend && NODE_ENV=production NODE_VERSION=18 npm install && NODE_ENV=production npx --no-install vue-cli-service build
     staticPublishPath: ./frontend/dist
     routes:
       - type: rewrite
